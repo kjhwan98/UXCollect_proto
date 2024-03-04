@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">UXCollect_proto</string>
+    <string name="caution">
+        \n 수집된 데이터는 연구용으로만 사용됩니다\n\n
+        모든 데이터는 익명처리되어 수집됩니다\n\n
+        데이터 수집을 위하여 상단 바의 알림은 항상 켜져 있습니다\n\n
+        원할한 데이터 수집을 위하여 전원이 켜진 상태를 유지해주세요\n\n
+        알림을 강제로 끄지 마세요\n\n
+        실험이 종료될 때 까지 앱을 삭제하지 마세요\n\n
+        </string>
+    <string name="contact">문의: 연구담당자 김재환\n (010-8718-5030)</string>
+</resources>
