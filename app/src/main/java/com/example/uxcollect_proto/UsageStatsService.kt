@@ -38,21 +38,11 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityRecognitionClient
 import android.provider.Settings
+import android.service.notification.NotificationListenerService
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.ServiceCompat.startForeground
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.content.ContextCompat.registerReceiver
 
 class UsageStatsService : Service() {
-    companion object {
-        @Volatile
-        private var lastActivity: String = "Unknown" // 마지막으로 감지된 사용자 활동
-
-        fun updateLastActivity(activity: String) {
-            lastActivity = activity // 사용자 활동 업데이트 함수
-        }
-    }
     // 변수 선언
     private var updateRunnable: Runnable? = null
     private var collectionStartTime: Long = 0
@@ -495,8 +485,7 @@ class UsageStatsService : Service() {
                     "Illuminance" to currentLux,  // Adding illuminance sensor data
                     "Proximity" to currentProximity,
                     "isCharging" to isCharging,
-                    "screenBrightness" to currentBrightness,
-                    "activity" to lastActivity
+                    "screenBrightness" to currentBrightness
                 )
                 // lastKnownLocation가 null이 아닌 경우에만 GPS 정보 추가
                 lastKnownLocation?.let {

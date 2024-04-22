@@ -24,7 +24,6 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -36,17 +35,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UXCollect_proto"
         tools:targetApi="34">
-        <service android:name=".UsageStatsService"
+        <service
+            android:name=".UsageStatsService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location|dataSync"
-            android:permission="TODO">
+            android:permission="android.permission.BIND_SERVICE">
         </service>
-        <service android:name=".NotificationListener"
+        <service
+            android:name=".MyNotificationListener"
+            android:label="Notification Listener"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
+                <action android:name="com.example.app.NOTIFICATION_POSTED" />
+                <action android:name="com.example.app.NOTIFICATION_REMOVED" />
             </intent-filter>
         </service>
         <activity
@@ -57,9 +61,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".ActivityTransitionReceiver"
-            android:exported="true">
-        </receiver>
         <receiver android:name=".BootShutdownReceiver"
             android:exported="false">
             <intent-filter>

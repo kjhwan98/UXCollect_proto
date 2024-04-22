@@ -27,6 +27,10 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat.registerReceiver
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.ContextCompat.startForegroundService
 import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.ActivityTransitionRequest
@@ -76,7 +80,6 @@ class MainActivity : AppCompatActivity() {
         requestNotificationPermission()
         requestBatteryOptimizationPermission()
         checkNotificationListenerPermission()
-        startActivityRecognition() // 활동인식 시작
 
         // 데이터 전송 버튼을 설정하고 클릭 이벤트 처리
         val sendDataButton: Button = findViewById(R.id.btnSendDataNow)
@@ -119,52 +122,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         startUsageStatsService()
-    }
-
-    // 활동 인식을 시작하는 메소드, 필요한 권한이 있는 경우에만 활동인식 시작
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private fun startActivityRecognition() {
-        // 권한 체크와 요청 로직
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            // 활동 전환을 감지하기 위한 PendingIntent 생성
-            val intent = Intent(this, ActivityTransitionReceiver::class.java)
-            val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            } else {
-                PendingIntent.FLAG_UPDATE_CURRENT
-            }
-            val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, pendingIntentFlags)
-
-            // 감지할 활동 유형과 전환 유형을 저장
-            val transitions = listOf(
-                DetectedActivity.IN_VEHICLE, DetectedActivity.ON_BICYCLE, DetectedActivity.ON_FOOT,
-                DetectedActivity.RUNNING, DetectedActivity.STILL, DetectedActivity.TILTING,
-                DetectedActivity.WALKING, DetectedActivity.UNKNOWN
-            ).flatMap { activityType ->
-                listOf(
-                    ActivityTransition.Builder()
-                        .setActivityType(activityType)
-                        .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-                        .build(),
-                    ActivityTransition.Builder()
-                        .setActivityType(activityType)
-                        .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
-                        .build()
-                )
-            }
-            // 활동 전환 업데이트 요청
-            val request = ActivityTransitionRequest(transitions)
-            ActivityRecognition.getClient(this).requestActivityTransitionUpdates(request, pendingIntent)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Activity recognition updates successfully requested", Toast.LENGTH_SHORT).show()
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Failed to request activity recognition updates: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        } else {
-            // 필요한 권항이 없으면 사용자에게 권한 요청
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), ACTIVITY_RECOGNITION_PERMISSION_REQUEST_CODE)
-        }
     }
 
     // 서비스 활성화 상태를 확인하고 설정하는 메소드
@@ -374,7 +331,7 @@ class MainActivity : AppCompatActivity() {
             ACTIVITY_RECOGNITION_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // 권한이 부여되면 활동인식 시작
-                    startActivityRecognition()
+                    // startActivityRecognition()
                 } else {
                     // 권한이 거부되면 사용자에게 필요성 설명
                     Toast.makeText(this, "Activity recognition permission is necessary for this feature to work", Toast.LENGTH_SHORT).show()
